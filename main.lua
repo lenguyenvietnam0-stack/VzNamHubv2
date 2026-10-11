@@ -84,7 +84,7 @@ local function CreateCategoryContainer(visible)
 end
 
 local tabContainers, mainTabButtons = {}, {}
-local tabNames = {"steal an egg", "blox kid", "phá và trộm một quả trứng", "Tab 4", "Tab 5"}
+local tabNames = {"steal an egg", "blox kid", "break and steal an egg", "Tab 4", "Tab 5"}
 
 for i = 1, 5 do
     local isFirst = (i == 1)
@@ -156,10 +156,13 @@ end)
 AddScriptButton(tabContainers[1].HasKeyScroll, "5. Speed hub(có key)", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
 end)
-AddScriptButton(tabContainers[1].HasKeyScroll, "6. Real kid(có key)", function()
+AddScriptButton(tabContainers[1].HasKeyScroll, "6. Neohub(có key)", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/neohubdev/script/main/script"))()
+end)
+AddScriptButton(tabContainers[1].HasKeyScroll, "7. Real kid(có key)", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua"))()
 end)
-AddScriptButton(tabContainers[1].HasKeyScroll, "7. Chilli v2(có key)", function()
+AddScriptButton(tabContainers[1].HasKeyScroll, "8. Chilli v2(có key)", function()
     loadstring(game:HttpGet("https://gist.githubusercontent.com/ronnei/1fa67c56dd9af203b192d15e752928e5/raw/4e2d5105640e09a008b4ae6df23f9708cadfef06/chilliv2-stealanegg"))()
 end)
 
@@ -197,7 +200,7 @@ end)
 
 -- ----------------- TAB 3 -----------------
 -- NO KEY:
-AddScriptButton(tabContainers[3].NoKeyScroll, "1. Tên break and steal an egg", function()
+AddScriptButton(tabContainers[3].NoKeyScroll, "1. break and steal an egg(không sài dc nx)", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))()
 end)
 -- CÓ KEY:
