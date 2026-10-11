@@ -84,7 +84,7 @@ local function CreateCategoryContainer(visible)
 end
 
 local tabContainers, mainTabButtons = {}, {}
-local tabNames = {"steal an egg", "bloxkid", "Tab 3", "Tab 4", "Tab 5"}
+local tabNames = {"steal an egg", "blox kid", "phá và trộm một quả trứng", "Tab 4", "Tab 5"}
 
 for i = 1, 5 do
     local isFirst = (i == 1)
@@ -197,8 +197,8 @@ end)
 
 -- ----------------- TAB 3 -----------------
 -- NO KEY:
-AddScriptButton(tabContainers[3].NoKeyScroll, "1. Tên Script No Key (Tab 3)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
+AddScriptButton(tabContainers[3].NoKeyScroll, "1. Tên break and steal an egg", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/joustingmatch/Ouroboros/main/loader.lua"))()
 end)
 -- CÓ KEY:
 AddScriptButton(tabContainers[3].HasKeyScroll, "1. Tên Script Có Key (Tab 3)", function()
