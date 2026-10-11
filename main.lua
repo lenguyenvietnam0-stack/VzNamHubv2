@@ -1,385 +1,128 @@
--- Khởi tạo UI Service
-local CoreGui = game:GetService("CoreGui")
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
+local CoreGui, Players, TweenService, UserInputService = game:GetService("CoreGui"), game:GetService("Players"), game:GetService("TweenService"), game:GetService("UserInputService")
 local localPlayer = Players.LocalPlayer
 
--- Xóa GUI cũ nếu đang chạy
-if CoreGui:FindFirstChild("VzNamHubGui") then
-    CoreGui.VzNamHubGui:Destroy()
-end
+if CoreGui:FindFirstChild("VzNamHubGui") then CoreGui.VzNamHubGui:Destroy() end
 
--- Biến lưu trữ nút script vừa bấm gần nhất
-local LastSelectedScriptBtn = nil
-local LastSelectedScriptStroke = nil
+local LastSelectedScriptBtn, LastSelectedScriptStroke = nil, nil
+local VzNamGui = Instance.new("ScreenGui", CoreGui) VzNamGui.Name = "VzNamHubGui" VzNamGui.ResetOnSpawn = false
 
--- Tạo ScreenGui chính
-local VzNamGui = Instance.new("ScreenGui")
-VzNamGui.Name = "VzNamHubGui"
-VzNamGui.Parent = CoreGui
-VzNamGui.ResetOnSpawn = false
-
--- Lấy link ảnh Avatar nhân vật
 local avatarUrl = "rbxassetid://6031094678"
-pcall(function()
-    avatarUrl = Players:GetUserThumbnailAsync(localPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-end)
+pcall(function() avatarUrl = Players:GetUserThumbnailAsync(localPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420) end)
 
--- 1. NÚT TRÒN TOGGLE
-local ToggleBtn = Instance.new("ImageButton")
-ToggleBtn.Name = "ToggleBtn"
-ToggleBtn.Parent = VzNamGui
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-ToggleBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
-ToggleBtn.Size = UDim2.new(0, 55, 0, 55)
-ToggleBtn.Active = true
-ToggleBtn.Draggable = true
-ToggleBtn.Image = avatarUrl
+-- NÚT TOGGLE
+local ToggleBtn = Instance.new("ImageButton", VzNamGui)
+ToggleBtn.Name, ToggleBtn.BackgroundColor3, ToggleBtn.Position, ToggleBtn.Size, ToggleBtn.Active, ToggleBtn.Draggable, ToggleBtn.Image = "ToggleBtn", Color3.fromRGB(30, 30, 30), UDim2.new(0.05, 0, 0.2, 0), UDim2.new(0, 55, 0, 55), true, true, avatarUrl
+Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
+local ToggleStroke = Instance.new("UIStroke", ToggleBtn) ToggleStroke.Color, ToggleStroke.Thickness = Color3.fromRGB(255, 255, 255), 2
 
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(1, 0)
-UICorner.Parent = ToggleBtn
+-- MENU CHÍNH
+local MainFrame = Instance.new("Frame", VzNamGui)
+MainFrame.Name, MainFrame.BackgroundColor3, MainFrame.Position, MainFrame.Size, MainFrame.ClipsDescendants = "MainFrame", Color3.fromRGB(255, 255, 255), UDim2.new(0.5, -170, 0.5, -150), UDim2.new(0, 370, 0, 310), true
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
-local UIStroke = Instance.new("UIStroke")
-UIStroke.Color = Color3.fromRGB(255, 255, 255)
-UIStroke.Thickness = 2
-UIStroke.Parent = ToggleBtn
+local RainbowGradient = Instance.new("UIGradient", MainFrame)
+RainbowGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 180, 180)), ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 220, 180)), ColorSequenceKeypoint.new(0.4, Color3.fromRGB(255, 255, 180)), ColorSequenceKeypoint.new(0.6, Color3.fromRGB(180, 255, 200)), ColorSequenceKeypoint.new(0.8, Color3.fromRGB(180, 220, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(220, 180, 255))})
+TweenService:Create(RainbowGradient, TweenInfo.new(8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, false), {Rotation = 360}):Play()
+local FrameStroke = Instance.new("UIStroke", MainFrame) FrameStroke.Color, FrameStroke.Thickness = Color3.fromRGB(255, 255, 255), 2
 
--- 2. BẢNG MENU CHÍNH
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Parent = VzNamGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-MainFrame.Position = UDim2.new(0.5, -170, 0.5, -150)
-MainFrame.Size = UDim2.new(0, 370, 0, 310)
-MainFrame.ClipsDescendants = true
+-- TITLE BAR
+local TitleBar = Instance.new("Frame", MainFrame)
+TitleBar.Name, TitleBar.Size, TitleBar.BackgroundColor3, TitleBar.BackgroundTransparency = "TitleBar", UDim2.new(1, 0, 0, 40), Color3.fromRGB(0, 0, 0), 0.6
+Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 12)
 
-local FrameCorner = Instance.new("UICorner")
-FrameCorner.CornerRadius = UDim.new(0, 12)
-FrameCorner.Parent = MainFrame
-
--- HIỆU ỨNG RAINBOW NỀN MENU
-local RainbowGradient = Instance.new("UIGradient")
-RainbowGradient.Parent = MainFrame
-RainbowGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 180, 180)),
-    ColorSequenceKeypoint.new(0.20, Color3.fromRGB(255, 220, 180)),
-    ColorSequenceKeypoint.new(0.40, Color3.fromRGB(255, 255, 180)),
-    ColorSequenceKeypoint.new(0.60, Color3.fromRGB(180, 255, 200)),
-    ColorSequenceKeypoint.new(0.80, Color3.fromRGB(180, 220, 255)),
-    ColorSequenceKeypoint.new(1.00, Color3.fromRGB(220, 180, 255))
-})
-
-local tweenInfo = TweenInfo.new(8, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, false)
-local tween = TweenService:Create(RainbowGradient, tweenInfo, {Rotation = 360})
-tween:Play()
-
-local FrameStroke = Instance.new("UIStroke")
-FrameStroke.Color = Color3.fromRGB(255, 255, 255)
-FrameStroke.Thickness = 2
-FrameStroke.Parent = MainFrame
-
--- Tiêu đề Menu
-local TitleBar = Instance.new("Frame")
-TitleBar.Name = "TitleBar"
-TitleBar.Parent = MainFrame
-TitleBar.Size = UDim2.new(1, 0, 0, 40)
-TitleBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-TitleBar.BackgroundTransparency = 0.6
-
-local TitleCorner = Instance.new("UICorner")
-TitleCorner.CornerRadius = UDim.new(0, 12)
-TitleCorner.Parent = TitleBar
-
--- Xử lý kéo bảng menu
 local dragging, dragInput, dragStart, startPos
 TitleBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
+        dragging, dragStart, startPos = true, input.Position, MainFrame.Position
+        input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
     end
 end)
+TitleBar.InputChanged:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end end)
+UserInputService.InputChanged:Connect(function(input) if input == dragInput and dragging then local delta = input.Position - dragStart MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y) end end)
 
-TitleBar.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
+local HeaderAvatar = Instance.new("ImageLabel", TitleBar) HeaderAvatar.Position, HeaderAvatar.Size, HeaderAvatar.BackgroundTransparency, HeaderAvatar.Image = UDim2.new(0, 10, 0.5, -14), UDim2.new(0, 28, 0, 28), 1, avatarUrl
+Instance.new("UICorner", HeaderAvatar).CornerRadius = UDim.new(1, 0)
 
-UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
+local TitleText = Instance.new("TextLabel", TitleBar)
+TitleText.Position, TitleText.Size, TitleText.BackgroundTransparency, TitleText.Text, TitleText.TextColor3, TitleText.TextSize, TitleText.Font, TitleText.TextXAlignment = UDim2.new(0, 45, 0, 0), UDim2.new(1, -50, 1, 0), 1, "TỔNG HỢP | 👑VzNam Hub v2👑|", Color3.fromRGB(255, 255, 255), 13, Enum.Font.SourceSansBold, Enum.TextXAlignment.Left
 
--- Avatar trên tiêu đề
-local HeaderAvatar = Instance.new("ImageLabel")
-HeaderAvatar.Name = "HeaderAvatar"
-HeaderAvatar.Parent = TitleBar
-HeaderAvatar.Position = UDim2.new(0, 10, 0.5, -14)
-HeaderAvatar.Size = UDim2.new(0, 28, 0, 28)
-HeaderAvatar.BackgroundTransparency = 1
-HeaderAvatar.Image = avatarUrl
+-- THANH TAB DỌC
+local TabBarLeftScroll = Instance.new("ScrollingFrame", MainFrame)
+TabBarLeftScroll.Position, TabBarLeftScroll.Size, TabBarLeftScroll.BackgroundTransparency, TabBarLeftScroll.CanvasSize, TabBarLeftScroll.ScrollBarThickness = UDim2.new(0, 8, 0, 48), UDim2.new(0, 100, 1, -56), 1, UDim2.new(0, 0, 0, 240), 3
+local LeftLayout = Instance.new("UIListLayout", TabBarLeftScroll) LeftLayout.Padding = UDim.new(0, 8)
 
-local AvatarCorner = Instance.new("UICorner")
-AvatarCorner.CornerRadius = UDim.new(1, 0)
-AvatarCorner.Parent = HeaderAvatar
-
--- Tiêu đề bảng Hub
-local TitleText = Instance.new("TextLabel")
-TitleText.Name = "TitleText"
-TitleText.Parent = TitleBar
-TitleText.Position = UDim2.new(0, 45, 0, 0)
-TitleText.Size = UDim2.new(1, -50, 1, 0)
-TitleText.BackgroundTransparency = 1
-TitleText.Text = "TỔNG HỢP | 👑VzNam Hub v2👑|"
-TitleText.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleText.TextSize = 13
-TitleText.Font = Enum.Font.SourceSansBold
-TitleText.TextXAlignment = Enum.TextXAlignment.Left
-
--- 3. THANH TAB DỌC BÊN TRÁI (10 TAB)
-local TabBarLeftScroll = Instance.new("ScrollingFrame")
-TabBarLeftScroll.Name = "TabBarLeftScroll"
-TabBarLeftScroll.Parent = MainFrame
-TabBarLeftScroll.Position = UDim2.new(0, 8, 0, 48)
-TabBarLeftScroll.Size = UDim2.new(0, 100, 1, -56)
-TabBarLeftScroll.BackgroundTransparency = 1
-TabBarLeftScroll.CanvasSize = UDim2.new(0, 0, 0, 480)
-TabBarLeftScroll.ScrollBarThickness = 3
-
-local LeftLayout = Instance.new("UIListLayout")
-LeftLayout.Parent = TabBarLeftScroll
-LeftLayout.SortOrder = Enum.SortOrder.LayoutOrder
-LeftLayout.Padding = UDim.new(0, 8)
-
--- HÀM TẠO KHUNG CHỨA SUB-TABS
 local function CreateCategoryContainer(visible)
-    local frame = Instance.new("Frame")
-    frame.Parent = MainFrame
-    frame.Position = UDim2.new(0, 114, 0, 48)
-    frame.Size = UDim2.new(1, -122, 1, -56)
-    frame.BackgroundTransparency = 1
-    frame.Visible = visible
+    local frame = Instance.new("Frame", MainFrame) frame.Position, frame.Size, frame.BackgroundTransparency, frame.Visible = UDim2.new(0, 114, 0, 48), UDim2.new(1, -122, 1, -56), 1, visible
+    local subBar = Instance.new("Frame", frame) subBar.Size, subBar.BackgroundTransparency = UDim2.new(1, 0, 0, 28), 1
+    local subLayout = Instance.new("UIListLayout", subBar) subLayout.FillDirection, subLayout.Padding = Enum.FillDirection.Horizontal, UDim.new(0, 6)
     
-    local subBar = Instance.new("Frame")
-    subBar.Parent = frame
-    subBar.Size = UDim2.new(1, 0, 0, 28)
-    subBar.BackgroundTransparency = 1
+    local noKeyBtn = Instance.new("TextButton", subBar) noKeyBtn.Size, noKeyBtn.BackgroundColor3, noKeyBtn.BackgroundTransparency, noKeyBtn.Text, noKeyBtn.TextColor3, noKeyBtn.Font, noKeyBtn.TextSize = UDim2.new(0.48, 0, 1, 0), Color3.fromRGB(0, 0, 0), 0.3, "no key", Color3.fromRGB(255, 255, 255), Enum.Font.SourceSansBold, 12
+    Instance.new("UICorner", noKeyBtn).CornerRadius = UDim.new(0, 6)
+    local nkStroke = Instance.new("UIStroke", noKeyBtn) nkStroke.Color, nkStroke.Thickness = Color3.fromRGB(255, 50, 50), 2
     
-    local subLayout = Instance.new("UIListLayout")
-    subLayout.Parent = subBar
-    subLayout.FillDirection = Enum.FillDirection.Horizontal
-    subLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    subLayout.Padding = UDim.new(0, 6)
+    local hasKeyBtn = Instance.new("TextButton", subBar) hasKeyBtn.Size, hasKeyBtn.BackgroundColor3, hasKeyBtn.BackgroundTransparency, hasKeyBtn.Text, hasKeyBtn.TextColor3, hasKeyBtn.Font, hasKeyBtn.TextSize = UDim2.new(0.48, 0, 1, 0), Color3.fromRGB(0, 0, 0), 0.7, "có key", Color3.fromRGB(200, 200, 200), Enum.Font.SourceSansBold, 12
+    Instance.new("UICorner", hasKeyBtn).CornerRadius = UDim.new(0, 6)
+    local hkStroke = Instance.new("UIStroke", hasKeyBtn) hkStroke.Color, hkStroke.Thickness = Color3.fromRGB(255, 255, 255), 1
     
-    local noKeyBtn = Instance.new("TextButton")
-    noKeyBtn.Parent = subBar
-    noKeyBtn.Size = UDim2.new(0.48, 0, 1, 0)
-    noKeyBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    noKeyBtn.BackgroundTransparency = 0.3
-    noKeyBtn.Text = "no key"
-    noKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    noKeyBtn.Font = Enum.Font.SourceSansBold
-    noKeyBtn.TextSize = 12
+    local scrollNoKey = Instance.new("ScrollingFrame", frame) scrollNoKey.Position, scrollNoKey.Size, scrollNoKey.BackgroundTransparency, scrollNoKey.CanvasSize, scrollNoKey.ScrollBarThickness, scrollNoKey.Visible = UDim2.new(0, 0, 0, 34), UDim2.new(1, 0, 1, -34), 1, UDim2.new(0, 0, 0, 2000), 4, true
+    Instance.new("UIListLayout", scrollNoKey).Padding = UDim.new(0, 8)
     
-    local nkCorner = Instance.new("UICorner")
-    nkCorner.CornerRadius = UDim.new(0, 6)
-    nkCorner.Parent = noKeyBtn
-
-    local nkStroke = Instance.new("UIStroke")
-    nkStroke.Color = Color3.fromRGB(255, 50, 50)
-    nkStroke.Thickness = 2
-    nkStroke.Parent = noKeyBtn
-    
-    local hasKeyBtn = Instance.new("TextButton")
-    hasKeyBtn.Parent = subBar
-    hasKeyBtn.Size = UDim2.new(0.48, 0, 1, 0)
-    hasKeyBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    hasKeyBtn.BackgroundTransparency = 0.7
-    hasKeyBtn.Text = "có key"
-    hasKeyBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-    hasKeyBtn.Font = Enum.Font.SourceSansBold
-    hasKeyBtn.TextSize = 12
-    
-    local hkCorner = Instance.new("UICorner")
-    hkCorner.CornerRadius = UDim.new(0, 6)
-    hkCorner.Parent = hasKeyBtn
-
-    local hkStroke = Instance.new("UIStroke")
-    hkStroke.Color = Color3.fromRGB(255, 255, 255)
-    hkStroke.Thickness = 1
-    hkStroke.Parent = hasKeyBtn
-    
-    local scrollNoKey = Instance.new("ScrollingFrame")
-    scrollNoKey.Parent = frame
-    scrollNoKey.Position = UDim2.new(0, 0, 0, 34)
-    scrollNoKey.Size = UDim2.new(1, 0, 1, -34)
-    scrollNoKey.BackgroundTransparency = 1
-    scrollNoKey.CanvasSize = UDim2.new(0, 0, 0, 2000)
-    scrollNoKey.ScrollBarThickness = 4
-    scrollNoKey.Visible = true
-    
-    local l1 = Instance.new("UIListLayout")
-    l1.Parent = scrollNoKey
-    l1.SortOrder = Enum.SortOrder.LayoutOrder
-    l1.Padding = UDim.new(0, 8)
-    
-    local scrollHasKey = Instance.new("ScrollingFrame")
-    scrollHasKey.Parent = frame
-    scrollHasKey.Position = UDim2.new(0, 0, 0, 34)
-    scrollHasKey.Size = UDim2.new(1, 0, 1, -34)
-    scrollHasKey.BackgroundTransparency = 1
-    scrollHasKey.CanvasSize = UDim2.new(0, 0, 0, 2000)
-    scrollHasKey.ScrollBarThickness = 4
-    scrollHasKey.Visible = false
-    
-    local l2 = Instance.new("UIListLayout")
-    l2.Parent = scrollHasKey
-    l2.SortOrder = Enum.SortOrder.LayoutOrder
-    l2.Padding = UDim.new(0, 8)
+    local scrollHasKey = Instance.new("ScrollingFrame", frame) scrollHasKey.Position, scrollHasKey.Size, scrollHasKey.BackgroundTransparency, scrollHasKey.CanvasSize, scrollHasKey.ScrollBarThickness, scrollHasKey.Visible = UDim2.new(0, 0, 0, 34), UDim2.new(1, 0, 1, -34), 1, UDim2.new(0, 0, 0, 2000), 4, false
+    Instance.new("UIListLayout", scrollHasKey).Padding = UDim.new(0, 8)
     
     noKeyBtn.MouseButton1Click:Connect(function()
-        scrollNoKey.Visible = true
-        scrollHasKey.Visible = false
-        noKeyBtn.BackgroundTransparency = 0.3
-        noKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        nkStroke.Color = Color3.fromRGB(255, 50, 50)
-        nkStroke.Thickness = 2
-        
-        hasKeyBtn.BackgroundTransparency = 0.7
-        hasKeyBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-        hkStroke.Color = Color3.fromRGB(255, 255, 255)
-        hkStroke.Thickness = 1
+        scrollNoKey.Visible, scrollHasKey.Visible = true, false
+        noKeyBtn.BackgroundTransparency, noKeyBtn.TextColor3, nkStroke.Color, nkStroke.Thickness = 0.3, Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 50, 50), 2
+        hasKeyBtn.BackgroundTransparency, hasKeyBtn.TextColor3, hkStroke.Color, hkStroke.Thickness = 0.7, Color3.fromRGB(200, 200, 200), Color3.fromRGB(255, 255, 255), 1
     end)
-    
     hasKeyBtn.MouseButton1Click:Connect(function()
-        scrollNoKey.Visible = false
-        scrollHasKey.Visible = true
-        hasKeyBtn.BackgroundTransparency = 0.3
-        hasKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        hkStroke.Color = Color3.fromRGB(255, 50, 50)
-        hkStroke.Thickness = 2
-        
-        noKeyBtn.BackgroundTransparency = 0.7
-        noKeyBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-        nkStroke.Color = Color3.fromRGB(255, 255, 255)
-        nkStroke.Thickness = 1
+        scrollNoKey.Visible, scrollHasKey.Visible = false, true
+        hasKeyBtn.BackgroundTransparency, hasKeyBtn.TextColor3, hkStroke.Color, hkStroke.Thickness = 0.3, Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 50, 50), 2
+        noKeyBtn.BackgroundTransparency, noKeyBtn.TextColor3, nkStroke.Color, nkStroke.Thickness = 0.7, Color3.fromRGB(200, 200, 200), Color3.fromRGB(255, 255, 255), 1
     end)
-    
     return frame, scrollNoKey, scrollHasKey
 end
 
-local tabContainers = {}
-local mainTabButtons = {}
+local tabContainers, mainTabButtons = {}, {}
+local tabNames = {"steal an egg", "bloxkid", "Tab 3", "Tab 4", "Tab 5"}
 
--- =========================================================================
--- ĐỔI TÊN 10 TAB CHÍNH Ở ĐÂY:
--- =========================================================================
-local tabNames = {
-    "steal an egg",
-    "blox kid",
-    "chưa có",
-    "chưa có",
-    "chưa có",
-    "chưa có",
-    "chưa có",
-    "chưa có",
-    "chưa có",
-    "chưa có"
-}
-
-for i = 1, 10 do
+for i = 1, 5 do
     local isFirst = (i == 1)
     local container, noKeyScroll, hasKeyScroll = CreateCategoryContainer(isFirst)
+    tabContainers[i] = {Container = container, NoKeyScroll = noKeyScroll, HasKeyScroll = hasKeyScroll}
     
-    tabContainers[i] = {
-        Container = container,
-        NoKeyScroll = noKeyScroll,
-        HasKeyScroll = hasKeyScroll
-    }
-    
-    local btn = Instance.new("TextButton")
-    btn.Parent = TabBarLeftScroll
-    btn.Size = UDim2.new(1, 0, 0, 38)
-    btn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    btn.BackgroundTransparency = isFirst and 0.3 or 0.7
-    btn.Text = tabNames[i]
-    btn.TextColor3 = isFirst and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 12
-    btn.TextWrapped = true
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
-    corner.Parent = btn
-
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = isFirst and Color3.fromRGB(255, 50, 50) or Color3.fromRGB(255, 255, 255)
-    stroke.Thickness = isFirst and 2 or 1
-    stroke.Parent = btn
-    
+    local btn = Instance.new("TextButton", TabBarLeftScroll)
+    btn.Size, btn.BackgroundColor3, btn.BackgroundTransparency, btn.Text, btn.TextColor3, btn.Font, btn.TextSize, btn.TextWrapped = UDim2.new(1, 0, 0, 38), Color3.fromRGB(0, 0, 0), isFirst and 0.3 or 0.7, tabNames[i], isFirst and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200), Enum.Font.SourceSansBold, 12, true
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    local stroke = Instance.new("UIStroke", btn) stroke.Color, stroke.Thickness = isFirst and Color3.fromRGB(255, 50, 50) or Color3.fromRGB(255, 255, 255), isFirst and 2 or 1
     mainTabButtons[i] = {Button = btn, Stroke = stroke}
     
     btn.MouseButton1Click:Connect(function()
-        for j = 1, 10 do
+        for j = 1, 5 do
             local active = (i == j)
             tabContainers[j].Container.Visible = active
-            mainTabButtons[j].Button.BackgroundTransparency = active and 0.3 or 0.7
-            mainTabButtons[j].Button.TextColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
-            mainTabButtons[j].Stroke.Color = active and Color3.fromRGB(255, 50, 50) or Color3.fromRGB(255, 255, 255)
-            mainTabButtons[j].Stroke.Thickness = active and 2 or 1
+            mainTabButtons[j].Button.BackgroundTransparency, mainTabButtons[j].Button.TextColor3 = active and 0.3 or 0.7, active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+            mainTabButtons[j].Stroke.Color, mainTabButtons[j].Stroke.Thickness = active and Color3.fromRGB(255, 50, 50) or Color3.fromRGB(255, 255, 255), active and 2 or 1
         end
     end)
 end
 
--- HÀM TẠO NÚT SCRIPT
 local function AddScriptButton(scrollParent, Name, Callback)
-    local Btn = Instance.new("TextButton")
-    Btn.Parent = scrollParent
-    Btn.Size = UDim2.new(1, 0, 0, 38)
-    Btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    Btn.BackgroundTransparency = 0.25
-    Btn.Text = Name
-    Btn.TextColor3 = Color3.fromRGB(40, 40, 40)
-    Btn.Font = Enum.Font.SourceSansSemibold
-    Btn.TextSize = 14
-    
-    local BtnCorner = Instance.new("UICorner")
-    BtnCorner.CornerRadius = UDim.new(0, 8)
-    BtnCorner.Parent = Btn
-
-    local BtnStroke = Instance.new("UIStroke")
-    BtnStroke.Color = Color3.fromRGB(255, 255, 255)
-    BtnStroke.Thickness = 1
-    BtnStroke.Parent = Btn
+    local Btn = Instance.new("TextButton", scrollParent)
+    Btn.Size, Btn.BackgroundColor3, Btn.BackgroundTransparency, Btn.Text, Btn.TextColor3, Btn.Font, Btn.TextSize = UDim2.new(1, 0, 0, 38), Color3.fromRGB(255, 255, 255), 0.25, Name, Color3.fromRGB(40, 40, 40), Enum.Font.SourceSansSemibold, 14
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
+    local BtnStroke = Instance.new("UIStroke", Btn) BtnStroke.Color, BtnStroke.Thickness = Color3.fromRGB(255, 255, 255), 1
     
     Btn.MouseButton1Click:Connect(function()
-        if LastSelectedScriptStroke then
-            LastSelectedScriptStroke.Color = Color3.fromRGB(255, 255, 255)
-            LastSelectedScriptStroke.Thickness = 1
-        end
-        
-        BtnStroke.Color = Color3.fromRGB(255, 50, 50)
-        BtnStroke.Thickness = 2.5
-        
-        LastSelectedScriptBtn = Btn
-        LastSelectedScriptStroke = BtnStroke
-        
+        if LastSelectedScriptStroke then LastSelectedScriptStroke.Color, LastSelectedScriptStroke.Thickness = Color3.fromRGB(255, 255, 255), 1 end
+        BtnStroke.Color, BtnStroke.Thickness = Color3.fromRGB(255, 50, 50), 2.5
+        LastSelectedScriptBtn, LastSelectedScriptStroke = Btn, BtnStroke
         Callback()
     end)
 end
 
 -- =========================================================================
--- ĐOẠN THÊM SCRIPT CHO TỪNG TAB (TỪ TAB 1 ĐẾN TAB 10):
+-- ĐOẠN THÊM SCRIPT CHO TỪNG TAB (TỪ TAB 1 ĐẾN TAB 5):
 -- =========================================================================
 
 -- ----------------- TAB 1: STEAL AN EGG -----------------
@@ -420,7 +163,6 @@ AddScriptButton(tabContainers[1].HasKeyScroll, "7. Chilli v2(có key)", function
     loadstring(game:HttpGet("https://gist.githubusercontent.com/ronnei/1fa67c56dd9af203b192d15e752928e5/raw/4e2d5105640e09a008b4ae6df23f9708cadfef06/chilliv2-stealanegg"))()
 end)
 
-
 -- ----------------- TAB 2: BLOXKID -----------------
 -- NO KEY:
 AddScriptButton(tabContainers[2].NoKeyScroll, "1. RedzHub v2 (no key)", function()
@@ -453,100 +195,34 @@ AddScriptButton(tabContainers[2].HasKeyScroll, "6. BananaHub(có key)", function
     loadstring(game:HttpGet("https://raw.githubusercontent.com/obiyeueim/vthangsitink/main/BananaHub.lua"))()
 end)
 
-
 -- ----------------- TAB 3 -----------------
 -- NO KEY:
 AddScriptButton(tabContainers[3].NoKeyScroll, "1. Tên Script No Key (Tab 3)", function()
     -- DÁN SCRIPT VÀO ĐÂY
 end)
-
 -- CÓ KEY:
 AddScriptButton(tabContainers[3].HasKeyScroll, "1. Tên Script Có Key (Tab 3)", function()
     -- DÁN SCRIPT VÀO ĐÂY
 end)
-
 
 -- ----------------- TAB 4 -----------------
 -- NO KEY:
 AddScriptButton(tabContainers[4].NoKeyScroll, "1. Tên Script No Key (Tab 4)", function()
     -- DÁN SCRIPT VÀO ĐÂY
 end)
-
 -- CÓ KEY:
 AddScriptButton(tabContainers[4].HasKeyScroll, "1. Tên Script Có Key (Tab 4)", function()
     -- DÁN SCRIPT VÀO ĐÂY
 end)
-
 
 -- ----------------- TAB 5 -----------------
 -- NO KEY:
 AddScriptButton(tabContainers[5].NoKeyScroll, "1. Tên Script No Key (Tab 5)", function()
     -- DÁN SCRIPT VÀO ĐÂY
 end)
-
 -- CÓ KEY:
 AddScriptButton(tabContainers[5].HasKeyScroll, "1. Tên Script Có Key (Tab 5)", function()
     -- DÁN SCRIPT VÀO ĐÂY
 end)
 
-
--- ----------------- TAB 6 -----------------
--- NO KEY:
-AddScriptButton(tabContainers[6].NoKeyScroll, "1. Tên Script No Key (Tab 6)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
-
--- CÓ KEY:
-AddScriptButton(tabContainers[6].HasKeyScroll, "1. Tên Script Có Key (Tab 6)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
-
-
--- ----------------- TAB 7 -----------------
--- NO KEY:
-AddScriptButton(tabContainers[7].NoKeyScroll, "1. Tên Script No Key (Tab 7)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
-
--- CÓ KEY:
-AddScriptButton(tabContainers[7].HasKeyScroll, "1. Tên Script Có Key (Tab 7)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
-
-
--- ----------------- TAB 8 -----------------
--- NO KEY:
-AddScriptButton(tabContainers[8].NoKeyScroll, "1. Tên Script No Key (Tab 8)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
-
--- CÓ KEY:
-AddScriptButton(tabContainers[8].HasKeyScroll, "1. Tên Script Có Key (Tab 8)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
-
-
--- ----------------- TAB 9 -----------------
--- NO KEY:
-AddScriptButton(tabContainers[9].NoKeyScroll, "1. Tên Script No Key (Tab 9)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
-
--- CÓ KEY:
-AddScriptButton(tabContainers[9].HasKeyScroll, "1. Tên Script Có Key (Tab 9)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
-
-
--- ----------------- TAB 10 -----------------
--- NO KEY:
-AddScriptButton(tabContainers[10].NoKeyScroll, "1. Tên Script No Key (Tab 10)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
-
--- CÓ KEY:
-AddScriptButton(tabContainers[10].HasKeyScroll, "1. Tên Script Có Key (Tab 10)", function()
-    -- DÁN SCRIPT VÀO ĐÂY
-end)
--- BẤM NÚT TRÒN BẬT/TẮT MENU
-ToggleBtn.MouseButton1Click:Connect(function()
+ToggleBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
